@@ -21,10 +21,6 @@ defmodule GazeWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-
-    live_session :chat, layout: {GazeWeb.Layouts, :chat} do
-      live "/chat", ChatLive
-    end
   end
 
   # Other scopes may use custom stacks.
@@ -69,9 +65,12 @@ defmodule GazeWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_authenticated_user,
-      on_mount: [{GazeWeb.UserAuth, :ensure_authenticated}] do
+      on_mount: [{GazeWeb.UserAuth, :ensure_authenticated}],
+      layout: {GazeWeb.Layouts, :chat} do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+
+      live "/chat", ChatLive
     end
   end
 
