@@ -18,6 +18,10 @@ defmodule GazeWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+
+    live_session :chat, layout: {GazeWeb.Layouts, :chat} do
+      live "/chat", ChatLive
+    end
   end
 
   # Other scopes may use custom stacks.
