@@ -9,3 +9,7 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+["general", "gaming", "linux"]
+|> Stream.map(&%{name: &1})
+|> Enum.map(&Gaze.Channels.create_channel!/1)

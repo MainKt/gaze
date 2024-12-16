@@ -8,7 +8,7 @@ defmodule GazeWeb.ChatLive.Components do
     ~H"""
     <div class="flex h-screen flex-1 flex-col bg-white">
       <.header class="px-4 py-3 border-b border-gray-200">
-        <.icon name="hero-hashtag-micro" /> {@channel}
+        <.icon name="hero-hashtag-micro" /> {@channel.name}
       </.header>
       <div class="px-4 pb-4 flex-1 flex flex-col overflow-auto">
         {render_slot(@inner_block)}
@@ -18,25 +18,41 @@ defmodule GazeWeb.ChatLive.Components do
   end
 
   attr :channels, :any, default: []
+  attr :selected, :string
 
   def channels_list(assigns) do
     ~H"""
     <div class="flex h-screen flex-col border-e bg-white min-w-64">
       <.header class="px-4 py-3 border-b border-gray-200">Home</.header>
-      <ul class="px-2 mt-4 space-y-1">
-        <li :for={channel <- @channels}>
-          <.link
-            href="#"
-            class={[
-              "block rounded-lg px-4 py-2 text-sm font-medium text-gray-700",
-              channel.selected && "!bg-gray-200",
-              "hover:bg-gray-100"
+      <section class="px-2 mt-4 space-y-1">
+        <ul>
+          <li :for={channel <- @channels}>
+            <.link
+              href="#"
+              class={[
+                "block rounded-lg px-4 py-2 text-sm font-medium text-gray-700",
+                channel == @selected && "!bg-gray-200",
+                "hover:bg-gray-100"
+                ]}
+            >
+              <.icon name="hero-hashtag-micro" /> {channel.name}
+            </.link>
+          </li>
+        </ul>
+
+        <div class="border-t" />
+
+        <.link
+          class={[
+            "block rounded-lg px-4 py-2",
+            " text-sm font-medium text-gray-700 text-center",
+            "bg-gray-50 hover:bg-gray-100",
+            " flex justify-center items-center"
             ]}
-          >
-            <.icon name="hero-hashtag-micro" /> {channel.name}
-          </.link>
-        </li>
-      </ul>
+        >
+          <.icon name="hero-plus-mini" /> <p>Add channel</p>
+        </.link>
+      </section>
     </div>
     """
   end

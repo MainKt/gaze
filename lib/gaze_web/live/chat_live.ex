@@ -3,15 +3,15 @@ defmodule GazeWeb.ChatLive do
 
   import GazeWeb.ChatLive.Components
 
-  def mount(_params, _session, socket) do
-    channels = [
-      %{name: "general", selected: false},
-      %{name: "rules", selected: false},
-      %{name: "linux", selected: true}
-    ]
+  alias Gaze.Channels
 
+  def mount(_params, _session, socket) do
     socket =
-      socket |> assign(channels: channels)
+      socket
+      |> assign(
+        channels: Channels.list_channels(),
+        selected_channel: Channels.get_one!()
+      )
 
     {:ok, socket}
   end
@@ -19,8 +19,8 @@ defmodule GazeWeb.ChatLive do
   def render(assigns) do
     ~H"""
     <div class="flex">
-      <.channels_list channels={@channels} />
-      <.chat_section channel={(@channels |> Enum.find(& &1.selected)).name}>
+      <.channels_list channels={@channels} selected={@selected_channel} />
+      <.chat_section channel={@selected_channel}>
         <.messages>
           <.message
             online={true}

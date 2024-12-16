@@ -70,7 +70,10 @@ defmodule GazeWeb.Router do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
 
-      live "/chat", ChatLive
+      scope "/chat" do
+        live "/", ChatLive
+        live "/channels/new", ChatLive, :new_channel
+      end
     end
   end
 
