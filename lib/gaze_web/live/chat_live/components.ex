@@ -33,7 +33,7 @@ defmodule GazeWeb.ChatLive.Components do
                 "block rounded-lg px-4 py-2 text-sm font-medium text-gray-700",
                 channel == @selected && "!bg-gray-200",
                 "hover:bg-gray-100"
-                ]}
+              ]}
             >
               <.icon name="hero-hashtag-micro" /> {channel.name}
             </.link>
@@ -49,9 +49,10 @@ defmodule GazeWeb.ChatLive.Components do
             " text-sm font-medium text-gray-700 text-center",
             "bg-gray-50 hover:bg-gray-100",
             " flex justify-center items-center"
-            ]}
+          ]}
         >
-          <.icon name="hero-plus-mini" /> <p>Add channel</p>
+          <.icon name="hero-plus-mini" />
+          <p>Add channel</p>
         </.link>
       </section>
     </div>
