@@ -43,6 +43,7 @@ defmodule GazeWeb.ChatLive.Components do
         <div class="border-t" />
 
         <.link
+          phx-click="add_new_channel"
           class={[
             "block rounded-lg px-4 py-2",
             " text-sm font-medium text-gray-700 text-center",
