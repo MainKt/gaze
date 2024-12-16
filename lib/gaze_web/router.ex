@@ -72,6 +72,7 @@ defmodule GazeWeb.Router do
 
       scope "/chat" do
         live "/", ChatLive
+        live "/:name", ChatLive
         live "/channels/new", ChatLive, :new_channel
       end
     end

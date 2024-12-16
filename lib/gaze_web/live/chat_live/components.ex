@@ -24,11 +24,11 @@ defmodule GazeWeb.ChatLive.Components do
     ~H"""
     <div class="flex h-screen flex-col border-e bg-white min-w-64">
       <.header class="px-4 py-3 border-b border-gray-200">Home</.header>
-      <section class="px-2 mt-4 space-y-1">
-        <ul>
+      <section class="px-2 my-4 space-y-1 flex flex-col overflow-auto">
+        <ul class="flex-1 overflow-y-scroll no-scrollbar">
           <li :for={channel <- @channels}>
             <.link
-              href="#"
+              patch={"/chat/#{channel.name}"}
               class={[
                 "block rounded-lg px-4 py-2 text-sm font-medium text-gray-700",
                 channel == @selected && "!bg-gray-200",

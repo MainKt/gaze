@@ -37,6 +37,12 @@ defmodule Gaze.Channels do
   """
   def get_channel!(id), do: Repo.get!(Channel, id)
 
+  def get_channel_by_name!(name) do
+    from(Channel)
+    |> where(name: ^name)
+    |> Repo.one!()
+  end
+
   def get_one!(), do: Repo.one!(from(Channel) |> limit(1))
 
   @doc """

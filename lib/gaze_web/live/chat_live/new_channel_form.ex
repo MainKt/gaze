@@ -36,8 +36,8 @@ defmodule GazeWeb.ChatLive.NewChannelForm do
 
   def handle_event("submit", %{"channel" => params}, socket) do
     case Channels.create_channel(params) do
-      {:ok, _channel} ->
-        send(self(), {__MODULE__, :create_channel})
+      {:ok, channel} ->
+        send(self(), {__MODULE__, {:create_channel, channel}})
         {:noreply, socket}
 
       {:error, %Ecto.Changeset{} = changeset} ->
