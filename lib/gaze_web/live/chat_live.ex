@@ -46,6 +46,16 @@ defmodule GazeWeb.ChatLive do
     {:noreply, socket}
   end
 
+  def group_messages(messages) do
+    messages
+    |> Enum.chunk_by(& &1.sent_by_user_id)
+    |> Enum.flat_map(fn chunk ->
+      chunk
+      |> Enum.map(&Map.put(&1, :compact, true))
+      |> List.update_at(-1, &Map.put(&1, :compact, false))
+    end)
+  end
+
   def render(assigns) do
     ~H"""
     <div class="flex">
@@ -54,12 +64,12 @@ defmodule GazeWeb.ChatLive do
       <%= if @selected_channel do %>
       <.chat_section channel={@selected_channel}>
         <.messages>
-          <.message :for={message <- @messages}
+          <.message :for={message <- @messages |> group_messages()}
             online={true}
             text={message.text}
             user={message.sent_by_user}
-            time={Message.show_time(message |> Map.put(:compact, false), @current_user.time_zone)}
-            compact={false}
+            time={Message.show_time(message, @current_user.time_zone)}
+            compact={message.compact}
           />
         </.messages>
 
