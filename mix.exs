@@ -32,6 +32,7 @@ defmodule Gaze.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:tzdata, "~> 1.1"},
       {:bcrypt_elixir, "~> 3.0"},
       {:phoenix, "~> 1.7.15"},
       {:phoenix_ecto, "~> 4.5"},

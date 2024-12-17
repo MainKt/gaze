@@ -60,6 +60,32 @@ defmodule Gaze.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
+  @colors [
+     "#94a3b8",
+     "#9ca3af",
+     "#a1a1aa",
+     "#a3a3a3",
+     "#a8a29e",
+     "#f87171",
+     "#fb923c",
+     "#fbbf24",
+     "#facc15",
+     "#a3e635",
+     "#4ade80",
+     "#34d399",
+     "#2dd4bf",
+     "#22d3ee",
+     "#38bdf8",
+     "#60a5fa",
+     "#818cf8",
+     "#a78bfa",
+     "#c084fc",
+     "#e879f9",
+     "#f472b6",
+     "#fb7185"
+   ]
+
+
   ## User registration
 
   @doc """
@@ -75,7 +101,7 @@ defmodule Gaze.Accounts do
 
   """
   def register_user(attrs) do
-    %User{}
+    %User{display_color: @colors |> Enum.random()}
     |> User.registration_changeset(attrs)
     |> Repo.insert()
   end
@@ -90,7 +116,11 @@ defmodule Gaze.Accounts do
 
   """
   def change_user_registration(%User{} = user, attrs \\ %{}) do
-    User.registration_changeset(user, attrs, hash_password: false, validate_email: false)
+    User.registration_changeset(user, attrs,
+      validate_username: false,
+      hash_password: false,
+      validate_email: false
+    )
   end
 
   ## Settings
@@ -265,6 +295,14 @@ defmodule Gaze.Accounts do
       Repo.insert!(user_token)
       UserNotifier.deliver_confirmation_instructions(user, confirmation_url_fun.(encoded_token))
     end
+  end
+
+  def list_other_users(user) do
+    Repo.all(
+      from u in User,
+        where: u.id != ^user.id,
+        order_by: [asc: u.username]
+    )
   end
 
   @doc """

@@ -5,8 +5,11 @@ defmodule Gaze.Accounts.User do
   @foreign_key_type :binary_id
   schema "users" do
     field :email, :string
+    field :username, :string
+    field :time_zone, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
+    field :display_color, :string
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
 
@@ -38,9 +41,11 @@ defmodule Gaze.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:time_zone, :username, :email, :password])
     |> validate_email(opts)
+    |> validate_username(opts)
     |> validate_password(opts)
+    |> validate_time_zone()
   end
 
   defp validate_email(changeset, opts) do
@@ -49,6 +54,19 @@ defmodule Gaze.Accounts.User do
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
     |> maybe_validate_unique_email(opts)
+  end
+
+  defp validate_username(changeset, opts) do
+    changeset
+    |> validate_required([:username])
+    |> validate_length(:username, min: 1, max: 40)
+    |> maybe_validate_unique_username(opts)
+  end
+
+  defp validate_time_zone(changeset) do
+    changeset
+    |> validate_required([:time_zone])
+    |> validate_inclusion(:time_zone, Tzdata.zone_list())
   end
 
   defp validate_password(changeset, opts) do
@@ -84,6 +102,16 @@ defmodule Gaze.Accounts.User do
       changeset
       |> unsafe_validate_unique(:email, Gaze.Repo)
       |> unique_constraint(:email)
+    else
+      changeset
+    end
+  end
+
+  defp maybe_validate_unique_username(changeset, opts) do
+    if Keyword.get(opts, :validate_username, true) do
+      changeset
+      |> unsafe_validate_unique(:username, Gaze.Repo)
+      |> unique_constraint(:username)
     else
       changeset
     end

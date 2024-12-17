@@ -7,6 +7,8 @@
 # General application configuration
 import Config
 
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+
 config :gaze,
   ecto_repos: [Gaze.Repo],
   generators: [timestamp_type: :utc_datetime, binary_id: true]

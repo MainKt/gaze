@@ -32,7 +32,16 @@ defmodule GazeWeb.UserRegistrationLive do
         </.error>
 
         <.input field={@form[:email]} type="email" label="Email" required />
+        <.input field={@form[:username]} type="text" label="Username" required />
         <.input field={@form[:password]} type="password" label="Password" required />
+
+        <input
+          type="hidden"
+          id={@form[:time_zone].id}
+          name={@form[:time_zone].name}
+          phx-hook="SetTimeZoneValue"
+          phx-update="ignore"
+        />
 
         <:actions>
           <.button phx-disable-with="Creating account..." class="w-full">Create an account</.button>
@@ -54,6 +63,7 @@ defmodule GazeWeb.UserRegistrationLive do
   end
 
   def handle_event("save", %{"user" => user_params}, socket) do
+    dbg(user_params)
     case Accounts.register_user(user_params) do
       {:ok, user} ->
         {:ok, _} =

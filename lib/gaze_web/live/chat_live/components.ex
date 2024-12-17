@@ -99,7 +99,7 @@ defmodule GazeWeb.ChatLive.Components do
     """
   end
 
-  attr :user, :string, required: true
+  attr :user, Gaze.Accounts.User, required: true
   attr :display_color, :string, default: "dodgerblue"
   attr :online, :boolean, required: true
   attr :time, :string, required: true
@@ -126,15 +126,15 @@ defmodule GazeWeb.ChatLive.Components do
     ~H"""
     <div class="relative flex gap-2 hover:bg-gray-100 px-4 pt-2 group">
       <.user_profile
-        user={@user}
+        user={@user.username}
         size={:md}
         class="mt-1"
         online={@online}
-        display_color={@display_color}
+        display_color={@user.display_color}
       />
       <div class="flex-1">
         <div class="space-x-1 leading-none">
-          <span class="text-sm font-bold">{@user}</span>
+          <span class="text-sm font-bold">{@user.username}</span>
           <span class="text-xs">{@time}</span>
         </div>
         <div class="flex-1">

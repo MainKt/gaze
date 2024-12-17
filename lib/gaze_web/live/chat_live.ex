@@ -4,6 +4,8 @@ defmodule GazeWeb.ChatLive do
   import GazeWeb.ChatLive.Components
 
   alias Gaze.Channels
+  alias Gaze.Messages
+  alias Gaze.Messages.Message
 
   def mount(_params, _session, socket) do
     socket =
@@ -18,13 +20,15 @@ defmodule GazeWeb.ChatLive do
 
   def handle_params(%{"name" => name}, _uri, socket) do
     selected_channel = Channels.get_channel_by_name!(name)
+    messages = Messages.list(selected_channel)
 
     socket =
       socket
       |> assign(
+        modal: nil,
         selected_channel: selected_channel,
         channels: Channels.list_channels(),
-        modal: nil
+        messages: messages
       )
 
     {:noreply, socket}
@@ -48,24 +52,29 @@ defmodule GazeWeb.ChatLive do
       <.channels_list channels={@channels} selected={@selected_channel} />
 
       <%= if @selected_channel do %>
-        <.chat_section channel={@selected_channel}>
-          <.messages>
-            <.message
-              online={true}
-              text="How are y'all doing?"
-              user="Main.kt"
-              time="5:30"
-              compact={true}
-            />
-            <.message online={true} text="I'm Main.kt" user="Main.kt" time="5:30" compact={true} />
-            <.message online={false} text="Howdy?" user="Main.kt" time="5:30" compact={false} />
-          </.messages>
-          <.input type="textarea" name="" value="" placeholder="Type a message" autofocus />
-        </.chat_section>
+      <.chat_section channel={@selected_channel}>
+        <.messages>
+          <.message :for={message <- @messages}
+            online={true}
+            text={message.text}
+            user={message.sent_by_user}
+            time={Message.show_time(message |> Map.put(:compact, false), @current_user.time_zone)}
+            compact={false}
+          />
+        </.messages>
+
+        <.live_component
+          id={"chat_component_#{@selected_channel.id}"}
+          module={__MODULE__.ChatForm}
+          current_user={@current_user}
+          current_channel={@selected_channel}
+        />
+
+      </.chat_section>
       <% else %>
-        <div class="my-auto mx-auto px-4">
-          <img class="max-w-40" src={~p"/images/logo.svg"} />
-        </div>
+      <div class="my-auto mx-auto px-4">
+        <img class="max-w-40" src={~p"/images/logo.svg"} />
+      </div>
       <% end %>
     </div>
 
@@ -83,11 +92,43 @@ defmodule GazeWeb.ChatLive do
     {:noreply, assign(socket, :modal, nil)}
   end
 
+  def handle_event("validate", %{"chat" => params}, socket) do
+    changeset =
+      %Message{}
+      |> Message.changeset(params)
+      |> Map.put(:action, :validate)
+
+    {:noreply, put_form(socket, changeset)}
+  end
+
+  def handle_event("submit", %{"channel" => params}, socket) do
+    case Messages.create_message(params) do
+      {:ok, _message} ->
+        {:noreply, socket}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, put_form(socket, changeset)}
+    end
+  end
+
+  def put_form(socket, value \\ %{}) do
+    assign(socket, :form, to_form(value, as: :chat))
+  end
+
   def handle_info({__MODULE__.NewChannelForm, {:create_channel, channel}}, socket) do
     socket =
       socket
       |> assign(model: nil, channels: Channels.list_channels())
       |> push_patch(to: ~p"/chat/#{channel.name}")
+
+    {:noreply, socket}
+  end
+
+  def handle_info({__MODULE__.ChatForm, :new_message}, socket) do
+    messages = Messages.list(socket.assigns.selected_channel)
+    socket =
+      socket
+      |> assign(model: nil, messages: messages)
 
     {:noreply, socket}
   end

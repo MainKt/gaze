@@ -21,6 +21,18 @@ defmodule Gaze.Messages do
     Repo.all(Message)
   end
 
+  def list(channel) when is_binary(channel) do
+    Gaze.Channels.get_channel_by_name!(channel) |> list()
+  end
+
+  def list(channel) do
+    from(Message)
+    |> where(channel_id: ^channel.id)
+    |> order_by(desc: :inserted_at)
+    |> preload([:sent_by_user])
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single message.
 
@@ -53,6 +65,20 @@ defmodule Gaze.Messages do
     %Message{}
     |> Message.changeset(attrs)
     |> Repo.insert()
+  end
+
+
+  def send!(channel, sent_by_user, attrs) do
+    %Message{}
+    |> Map.put(:channel, channel)
+    |> Map.put(:sent_by_user, sent_by_user)
+    |> Message.changeset(attrs)
+    |> Repo.insert!()
+  end
+
+  def send_message(chat, attrs) do
+    {:ok, _message} = Messages.send(chat.current_channel, chat.user, attrs)
+    chat
   end
 
   @doc """

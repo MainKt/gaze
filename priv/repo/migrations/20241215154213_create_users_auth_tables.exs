@@ -6,6 +6,9 @@ defmodule Gaze.Repo.Migrations.CreateUsersAuthTables do
 
     create table(:users, primary_key: false) do
       add :id, :binary_id, primary_key: true
+      add :display_color, :string, null: false
+      add :username, :citext, null: false
+      add :time_zone, :string, null: false
       add :email, :citext, null: false
       add :hashed_password, :string, null: false
       add :confirmed_at, :utc_datetime
@@ -13,7 +16,7 @@ defmodule Gaze.Repo.Migrations.CreateUsersAuthTables do
       timestamps(type: :utc_datetime)
     end
 
-    create unique_index(:users, [:email])
+    create unique_index(:users, [:username, :email])
 
     create table(:users_tokens, primary_key: false) do
       add :id, :binary_id, primary_key: true
